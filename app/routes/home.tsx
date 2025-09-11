@@ -1,13 +1,42 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
-
+import {resumes} from "../constants"
+import Navbar from "~/components/Navbar";
+import {callbackify} from "node:util";
+import ResumeCard from "~/components/ResumeCard";
+import {usePuterStore} from "~/lib/puter";
+import {useLocation, useNavigate} from "react-router";
+import {useEffect} from "react";
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Resumemind" },
+    { name: "description", content: "Smart feedback for your dream Job!" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+    const {auth}=usePuterStore();
+    const navigate=useNavigate();
+
+    useEffect(() => {
+        if (!auth.isAuthenticated) navigate("/auth?next=/");
+    }, [auth.isAuthenticated]);
+
+  return <main className="bg-[url('/public/images/bg-main.svg')] bg-cover">
+      <Navbar />
+<section className="main-section">
+<div className="page-heading py-16">
+
+    <h1>Track your Applications and Resume Ratings</h1>
+    <h2>Review your submission and check AI-Powered feedback</h2>
+</div>
+      {resumes.length > 0 &&(
+  <div className="resumes-section">
+      {resumes.map((resume, index) => (
+          <ResumeCard key={resume.id} resume={resume} />
+      ))}
+  </div>
+      )}
+</section>
+
+  </main>
 }
