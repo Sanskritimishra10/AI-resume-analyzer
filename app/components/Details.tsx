@@ -19,7 +19,11 @@ const ScoreBadge = ({ score }: { score: number }) => {
             )}
         >
             <img
-                src={score > 69 ? "/public/public/icons/check.svg" : "/public/public/icons/warning.svg"}
+                src={
+                    score > 69
+                        ? "/public/public/icons/check.svg"
+                        : "/public/public/icons/warning.svg"
+                }
                 alt="score"
                 className="size-4"
             />
@@ -44,8 +48,10 @@ const CategoryHeader = ({
                             categoryScore,
                         }: {
     title: string;
-    categoryScore: number;
+    categoryScore?: number;
 }) => {
+    if (categoryScore === undefined) return null;
+
     return (
         <div className="flex flex-row gap-4 items-center py-2">
             <p className="text-2xl font-semibold">{title}</p>
@@ -57,8 +63,14 @@ const CategoryHeader = ({
 const CategoryContent = ({
                              tips,
                          }: {
-    tips: { type: "good" | "improve"; tip: string; explanation: string }[];
+    tips?: { type: "good" | "improve"; tip: string; explanation: string }[];
 }) => {
+    if (!tips || tips.length === 0) {
+        return (
+            <p className="text-gray-500 italic px-4 py-2">No feedback available.</p>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-4 items-center w-full">
             <div className="bg-gray-50 w-full rounded-lg px-5 py-4 grid grid-cols-2 gap-4">
@@ -66,7 +78,9 @@ const CategoryContent = ({
                     <div className="flex flex-row gap-2 items-center" key={index}>
                         <img
                             src={
-                                tip.type === "good" ? "/public/public/icons/check.svg" : "/public/public/icons/warning.svg"
+                                tip.type === "good"
+                                    ? "/public/public/icons/check.svg"
+                                    : "/public/public/icons/warning.svg"
                             }
                             alt="score"
                             className="size-5"
@@ -110,50 +124,94 @@ const Details = ({ feedback }: { feedback: Feedback }) => {
     return (
         <div className="flex flex-col gap-4 w-full">
             <Accordion>
-                <AccordionItem id="tone-style">
-                    <AccordionHeader itemId="tone-style">
-                        <CategoryHeader
-                            title="Tone & Style"
-                            categoryScore={feedback.toneAndStyle.score}
-                        />
-                    </AccordionHeader>
-                    <AccordionContent itemId="tone-style">
-                        <CategoryContent tips={feedback.toneAndStyle.tips} />
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem id="content">
-                    <AccordionHeader itemId="content">
-                        <CategoryHeader
-                            title="Content"
-                            categoryScore={feedback.content.score}
-                        />
-                    </AccordionHeader>
-                    <AccordionContent itemId="content">
-                        <CategoryContent tips={feedback.content.tips} />
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem id="structure">
-                    <AccordionHeader itemId="structure">
-                        <CategoryHeader
-                            title="Structure"
-                            categoryScore={feedback.structure.score}
-                        />
-                    </AccordionHeader>
-                    <AccordionContent itemId="structure">
-                        <CategoryContent tips={feedback.structure.tips} />
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem id="skills">
-                    <AccordionHeader itemId="skills">
-                        <CategoryHeader
-                            title="Skills"
-                            categoryScore={feedback.skills.score}
-                        />
-                    </AccordionHeader>
-                    <AccordionContent itemId="skills">
-                        <CategoryContent tips={feedback.skills.tips} />
-                    </AccordionContent>
-                </AccordionItem>
+                {feedback.toneAndStyle && (
+                    <AccordionItem id="tone-style">
+                        <AccordionHeader itemId="tone-style">
+                            <CategoryHeader
+                                title="Tone & Style"
+                                categoryScore={feedback.toneAndStyle.score}
+                            />
+                        </AccordionHeader>
+                        <AccordionContent itemId="tone-style">
+                            <CategoryContent tips={feedback.toneAndStyle.tips} />
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
+                {feedback.content && (
+                    <AccordionItem id="content">
+                        <AccordionHeader itemId="content">
+                            <CategoryHeader
+                                title="Content"
+                                categoryScore={feedback.content.score}
+                            />
+                        </AccordionHeader>
+                        <AccordionContent itemId="content">
+                            <CategoryContent tips={feedback.content.tips} />
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
+                {feedback.structure && (
+                    <AccordionItem id="structure">
+                        <AccordionHeader itemId="structure">
+                            <CategoryHeader
+                                title="Structure"
+                                categoryScore={feedback.structure.score}
+                            />
+                        </AccordionHeader>
+                        <AccordionContent itemId="structure">
+                            <CategoryContent tips={feedback.structure.tips} />
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
+                {feedback.skills && (
+                    <AccordionItem id="skills">
+                        <AccordionHeader itemId="skills">
+                            <CategoryHeader
+                                title="Skills"
+                                categoryScore={feedback.skills.score}
+                            />
+                        </AccordionHeader>
+                        <AccordionContent itemId="skills">
+                            <CategoryContent tips={feedback.skills.tips} />
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
+
+                {feedback.ATS && (
+                    <AccordionItem id="ats">
+                        <AccordionHeader itemId="ats">
+                            <CategoryHeader title="ATS" categoryScore={feedback.ATS.score} />
+                        </AccordionHeader>
+                        <AccordionContent itemId="ats">
+                            {/* ATS tips don’t have explanation in your type → fallback */}
+                            <div className="flex flex-col gap-2 px-4 py-2">
+                                {feedback.ATS.tips.map((tip, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={cn(
+                                            "flex flex-row gap-2 items-center",
+                                            tip.type === "good" ? "text-green-600" : "text-yellow-600"
+                                        )}
+                                    >
+                                        <img
+                                            src={
+                                                tip.type === "good"
+                                                    ? "/public/public/icons/check.svg"
+                                                    : "/public/public/icons/warning.svg"
+                                            }
+                                            alt="tip"
+                                            className="size-5"
+                                        />
+                                        <p>{tip.tip}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                )}
             </Accordion>
         </div>
     );
